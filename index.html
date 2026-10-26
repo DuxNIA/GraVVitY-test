@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Тест: подготовка к сертификации 1С</title>
+<meta name="theme-color" content="#2b6cb0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Тест 1С">
+<meta name="format-detection" content="telephone=no">
+<meta name="robots" content="noindex">
+
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<!-- Экран «Кнопки не работают?» (виден только если JS не запустился) -->
+<div id="nojsWarning">
+  <div style="font-size:44px">📵</div>
+  <h2>Кнопки не работают? Страница открыта в режиме просмотра</h2>
+  <p>Telegram, «Файлы», почта и другие приложения показывают HTML как <b>картинку без JavaScript</b> — поэтому кнопки не нажимаются.</p>
+  <ol>
+    <li>Откройте тренажёр <b>по https-ссылке в Safari</b>.</li>
+    <li>Нажмите «Поделиться» → <b>«На экран «Домой»»</b>.</li>
+    <li>Запускайте тренажёр с иконки — прогресс будет сохраняться.</li>
+  </ol>
+  <div class="hint">Если это 1-файловая версия: в «Файлах» нажмите «Поделиться» → «Открыть в…» и выберите <b>Яндекс Браузер или Chrome</b> (Safari локальные HTML-файлы не открывает).</div>
+</div>
+
+<script>
+document.getElementById('nojsWarning').style.display='none';
+setTimeout(function(){
+  if(!window.IOSStore){
+    var w=document.getElementById('nojsWarning');
+    w.querySelector('h2').textContent='Не загрузились файлы приложения';
+    w.style.display='block';
+  }
+},6000);
+</script>
+
+
+  <!-- НОВЫЙ ГЛАВНЫЙ ЭКРАН -->
+<div class="app-container" id="mobileDashboard">
+  
+  <!-- Верхняя шапка профиля -->
+  <header class="mobile-header">
+    <div class="user-profile">
+      <div class="avatar">👨‍💻</div>
+      <div class="user-info">
+        <h1 id="mobileTitle" class="user-name">Тест 1С</h1>
+        <!-- Сюда будем выводить уровень -->
+        <div id="mobileLevelText" class="user-status" style="color:var(--accent); font-weight:700;">Новичок</div>
+      </div>
+    </div>
+    <!-- Блок геймификации -->
+    <div class="gamification-header" onclick="openStats()">
+      <div class="gami-item" title="Серия дней"><span id="mobileStreakBadge">🔥 0</span></div>
+      <div class="gami-item" title="Опыт"><span id="mobileXpLevel">⭐ 0 XP</span></div>
+    </div>
+  </header>
+
+  <!-- Карточка дневной цели / квеста -->
+  <div class="daily-goal-card" onclick="openQuestsModal()">
+    <div class="goal-header">
+      <div class="goal-title">🎯 Квест дня: <span id="mobileGoalBadge">—</span></div>
+      <div class="goal-xp">+50 XP</div>
+    </div>
+    <div class="goal-desc" id="mobileGoalDesc">Выполните задание, чтобы получить награду.</div>
+  </div>
+  
+  <!-- Кнопки квестов и старта -->
+  <button class="btn-block" id="questsBtn" onclick="openQuestsModal()" style="padding: 14px; border-radius: 14px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-weight: 700;">
+    📋 Ежедневные квесты (<span id="questsCount">0/3</span>)
+  </button>
+
+  <button class="btn-primary btn-hero" onclick="openStartOptionsModal()">▶ Начать тест</button>
+  </button>
+
+  <!-- ПОИСК ЗДЕСЬ -->
+  <div class="search-block" style="margin-bottom: 0; position: relative; z-index: 50;">
+    <input type="search" id="mobileSearchInput" placeholder="Поиск по вопросам, вариантам, ID…" autocomplete="off">
+    <div class="search-results" id="mobileSearchResults" style="top: 100%; border-radius: 0 0 var(--radius-sm) var(--radius-sm);"></div>
+  </div>
+
+  <!-- Сетка навигации 2x2 -->
+  <div class="nav-grid-2x2" style="margin-top: 12px;">
+    <!-- ... остальные кнопки (Карта, Рекорды, Босс, Достижения) ... -->
+   <div class="nav-card-large" onclick="document.getElementById('mapBtn').click()">
+  <div class="nav-icon-large">🗺️</div>
+  <div class="nav-title">Карта тем</div>
+  <div class="nav-sub">Прогресс по темам</div>
+</div>
+<div class="nav-card-large" onclick="document.getElementById('recordsBtn').click()">
+  <div class="nav-icon-large">🏅</div>
+  <div class="nav-title">Рекорды</div>
+  <div class="nav-sub">Личные достижения</div>
+</div>
+<div class="nav-card-large" onclick="document.getElementById('bossDayBtn').click()">
+  <div class="nav-icon-large">⚔️</div>
+  <div class="nav-title">Босс дня</div>
+  <div class="nav-sub">Сразись за награду</div>
+</div>
+<div class="nav-card-large" onclick="document.getElementById('gamificationBadgesBtn').click()">
+  <div class="nav-icon-large">🏆</div>
+  <div class="nav-title">Достижения</div>
+  <div class="nav-sub"><span id="mobileBadgesCount">0</span> из 23</div>
+</div>
+  </div>
+
+  <!-- Нижние кнопки -->
+  <div class="bottom-actions">
+    <button class="btn-secondary" onclick="openMobileSettings()">⚙️ Настройки</button>
+    <button class="btn-secondary" onclick="openMobileTop()">🔥 Топ ошибок</button>
+  </div>
+
+
+</div>
+
+
+<!-- МОДАЛКА НАСТРОЕК -->
+<div id="mobileSettingsModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>⚙️ Настройки</h2>
+      <button class="icon-btn-close" onclick="closeMobileSettings()">✕</button>
+    </div>
+    <div class="modal-body" id="mobileSettingsBody"></div>
+  </div>
+</div>
+
+<!-- МОДАЛКА СТАТИСТИКИ -->
+<div id="mobileStatsModal" class="modal-overlay">
+  <div class="modal-content full-screen">
+    <div class="modal-header">
+      <h2>📊 Статистика</h2>
+      <button class="icon-btn-close" onclick="document.getElementById('mobileStatsModal').classList.remove('active')">✕</button>
+    </div>
+    <div class="modal-body" id="mobileStatsBody"></div>
+  </div>
+</div>
+
+<!-- МОДАЛКА ТОПА ОШИБОК -->
+<div id="mobileTopModal" class="modal-overlay">
+  <div class="modal-content full-screen">
+    <div class="modal-header">
+      <h2>🔥 Топ ошибок</h2>
+      <button class="icon-btn-close" onclick="document.getElementById('mobileTopModal').classList.remove('active')">✕</button>
+    </div>
+    <div class="modal-body" id="mobileTopBody"></div>
+  </div>
+</div>
+
+<!-- Панель закрытия теста -->
+<div id="testCloseBar" class="test-close-bar" style="display: none;">
+  <button class="test-close-btn" onclick="closeTestModal()">✕</button>
+</div>
+
+<div id="oldWrapper" style="display: none;">
+  <div id="progressFill" style="width:0%;"></div>
+  <h1 id="title">Тест</h1>
+  <div class="topics-summary" id="topicsSummary" style="display:none;"></div>
+  <div class="sub" id="subtitle">—</div>
+
+  <div class="toolbar">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div class="counter" id="counter">—</div>
+      <span id="gamificationBadge"></span>
+	  <span id="gamificationXpBadge"></span> 
+	  <button id="gamificationBadgesBtn" class="ghost" style="padding:2px 6px; font-size:13px; height:auto; border:none; background:transparent; cursor:pointer;" title="Мои достижения">🏆 <span id="gamificationBadgesCount">0</span>/21</button>
+    </div>
+    <div class="nav-right">
+	  <button class="ghost" id="questsBtn">📋 <span id="questsCount">0/3</span></button>
+	  <button class="ghost" id="bossDayBtn">⚔️ Босс дня</button>
+	  <button class="ghost" id="mapBtn">🗺️ Карта</button>
+	  <button class="ghost" id="statsBtn">📊 Статистика</button>
+	  <button class="ghost" id="recordsBtn">🏅 Рекорды</button>
+      <button class="ghost" id="topBtn">🏆 Топ ошибок</button>
+      <button class="ghost" id="restartBtn">Начать заново</button>
+    </div>
+  </div>
+
+  <div class="progress-bar"><div id="progressFill"></div></div>
+
+  <div class="settings-wrap">
+    <button class="settings-toggle" id="settingsToggle">
+      <span class="arrow">▶</span> Настройки
+    </button>
+
+    <div class="settings" id="settingsPanel">
+
+      <div class="settings-row settings-row-3">
+               <div class="settings-cell">
+          <div class="cell-head">Файл вопросов</div>
+          <input type="file" id="fileInput" accept=".js,.json,.txt">
+          <div class="file-status" id="fileStatus"></div>
+          
+          <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="skin-btn" id="exportBtn">💾 Экспорт в HTML</button>
+			<button class="skin-btn" id="buildMobileBtn" style="border-color:var(--ok); color:var(--ok);">📱 Мобильный билд</button>
+          </div>
+          <div class="export-status" id="exportStatus"></div>
+          <div class="export-progress" id="exportProgress"></div>
+
+          <!-- НОВЫЙ БЛОК: Ключи ответов -->
+          <div style="margin-top:12px; border-top:1px dashed var(--border); padding-top:8px;">
+            <div class="cell-head" style="font-size:11px; margin-bottom:6px; color:var(--muted);">Ключ ответов</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="skin-btn" id="exportKeyBtn" style="font-size:11px; padding:4px 8px;">⬇ Выгрузить ключ</button>
+              <button class="skin-btn" id="importKeyBtn" style="font-size:11px; padding:4px 8px;">⬆ Загрузить ключ</button>
+            </div>
+            <input type="file" id="importKeyInput" accept=".json" style="display:none;">
+          </div>
+        </div>
+
+        <div class="settings-cell">
+          <div class="cell-head">Режим</div>
+          <select id="modeSelect" style="background: var(--card); color: var(--text); border: 1px solid var(--border); padding: 4px; border-radius: 4px;">
+            	<option value="training">Тренировка</option>
+		<option value="learning">Обучение (сразу с ответами)</option>
+            	<option value="exam">Экзамен (1 вопрос из каждой темы)</option>
+          </select>
+        </div>
+
+        <div class="settings-cell">
+          <div class="cell-head">Внешний вид</div>
+          <div class="skin-row">
+            <select id="skinSelect">
+              <option value="default">По умолчанию</option>
+            </select>
+          </div>
+          <div class="skin-row" style="margin-top:6px;">
+            <button class="skin-btn" id="skinLoadBtn">Загрузить скин</button>
+            <button class="skin-btn" id="skinLoadMultipleBtn">Несколько</button>
+            <button class="skin-btn danger" id="skinResetBtn">Сбросить</button>
+          </div>
+          <input type="file" id="skinFileInput" accept=".css" multiple style="display:none;">
+        </div>
+
+      </div>
+
+      <div class="settings-row settings-row-2">
+        <div class="settings-cell">
+          <div class="cell-head">Темы</div>
+          <div class="topics-head">
+            <a id="topicsAll">выбрать все</a>
+            <a id="topicsNone">снять все</a>
+          </div>
+          <div class="topics-list" id="topicsList"></div>
+        </div>
+
+        <div class="settings-cell">
+          <div class="cell-head">Особые наборы</div>
+          <div class="special-block">
+            <label><input type="checkbox" id="specialFav"> Только избранное (<span id="favCount">0</span>)</label>
+            <label><input type="checkbox" id="specialErr"> Только ошибки (<span id="errCount">0</span>)</label>
+            <div class="special-row">
+              <button class="danger" id="resetStatsBtn" style="font-size:12px;padding:6px 10px;">Сбросить статистику</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-row">
+        <div class="settings-cell" style="padding:0;border:none;background:transparent;">
+          <div class="cell-head" style="margin:0 0 6px 2px;">Поведение</div>
+          
+		   <label style="font-weight:600;">Дневная цель:</label>
+            <select id="dailyGoalSelect" style="padding:6px; border-radius:6px; border:1px solid var(--border); font-size:14px; width: 100%; max-width: 300px;">
+			  <option value="random_all">Квест дня (случайный)</option>
+              <option value="q10">10 вопросов</option>
+              <option value="q20">20 вопросов</option>
+              <option value="q30">30 вопросов</option>
+              <option value="q50">50 вопросов</option>
+              <option value="rand_q">Случайная цель (5-20 вопросов)</option>
+              <option value="t15">15 минут</option>
+              <option value="t30">30 минут</option>
+              <option value="err3">Закрыть 3 ошибки</option>
+              <option value="err5">Закрыть 5 ошибок</option>
+              <option value="err10">Закрыть 10 ошибок</option>
+              <option value="st5">5 правильных подряд</option>
+              <option value="st10">10 правильных подряд</option>
+              <option value="st15">15 правильных подряд</option>
+              <option value="topic">Тема дня (закрыть любую тему)</option>
+			  <option value="off">Выключено</option>
+            </select>
+		  <div class="behaviour-row">
+            <label><input type="checkbox" id="shuffleQ"> Перемешать вопросы</label>
+            <label><input type="checkbox" id="shuffleA"> Перемешать варианты</label>
+            <label><input type="checkbox" id="autoAdvance"> Автопереход после верного ответа</label>
+            <label><input type="checkbox" id="showImages" checked> Показывать картинки</label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="search-block" id="searchBlock">
+    <input type="search" id="searchInput" placeholder="Поиск по вопросам, вариантам, ID…" autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <!-- Плашка Квеста Дня -->
+  <div id="gamificationQuestCard" style="display:none; margin-bottom:16px; padding:12px 16px; background:#fff; border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.05); font-size:14px; position:relative; align-items:center; justify-content:space-between; gap:10px;">
+    <div id="questCardContent" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <!-- Сюда модуль вставит текст -->
+    </div>
+    <button id="questCardClose" style="background:none; border:none; color:#9ca3af; cursor:pointer; font-size:18px; padding:0; line-height:1;" title="Скрыть">✕</button>
+  </div>
+
+  <div id="quiz"></div>
+</div>
+
+<!-- ЭКРАН СТАТИСТИКИ -->
+<div id="statsOverlay" style="position:fixed; inset:0; z-index:2000; background:var(--bg); display:none; flex-direction:column; overflow-y:auto;">
+  <div style="padding:16px 24px; background:var(--card); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10;">
+    <h2 style="margin:0; font-size:20px;">📊 Статистика подготовки</h2>
+    <button id="closeStatsBtn" class="ghost">✕</button>
+  </div>
+  
+  <div style="max-width:1000px; margin:0 auto; width:100%; padding:24px; display:grid; gap:24px; grid-template-columns:1fr 1fr;">
+    
+       <!-- Карточка 1: Общая сводка -->
+    <div class="card" style="padding:20px; display:flex; flex-direction:column; align-items:center;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Общий прогресс</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px; text-align:center;">Соотношение освоенных вопросов, активных ошибок и неначатых тем.</p>
+      <div style="position:relative; width:200px; height:200px;">
+        <canvas id="chartSummary"></canvas>
+      </div>
+      <div id="summaryText" style="margin-top:20px; font-size:15px; text-align:center;"></div>
+    </div>
+
+    <!-- Карточка 2: Прогресс по темам -->
+    <div class="card" style="padding:20px;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Освоение тем</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px;">Процент закрытых вопросов (без активных ошибок) в каждой теме.</p>
+      <div style="position:relative; width:100%; height:250px;">
+        <canvas id="chartTopics"></canvas>
+      </div>
+    </div>
+
+    <!-- Карточка 3: Самые сложные вопросы -->
+    <div class="card" style="padding:20px; grid-column: 1 / -1;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Топ-5 вопросов, требующих внимания</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px;">Вопросы, в которых ты чаще всего ошибаешься. Рекомендуется повторить.</p>
+      <div style="position:relative; width:100%; height:250px;">
+        <canvas id="chartHard"></canvas>
+      </div>
+    </div>
+
+    <!-- Карточка 4: Время в приложении -->
+    <div class="card" style="padding:20px;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Время в приложении (мин)</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px;">Активное время работы с тестером за последние 7 дней.</p>
+      <div style="position:relative; width:100%; height:200px;">
+        <canvas id="chartTime"></canvas>
+      </div>
+    </div>
+
+    <!-- Карточка 5: Количество ответов -->
+    <div class="card" style="padding:20px;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Решено вопросов за день</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px;">Количество выбранных ответов за последние 7 дней.</p>
+      <div style="position:relative; width:100%; height:200px;">
+        <canvas id="chartAnswers"></canvas>
+      </div>
+    </div>
+
+    <!-- Карточка 6: Точность ответов -->
+    <div class="card" style="padding:20px; display:flex; flex-direction:column; align-items:center;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Точность ответов</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px; text-align:center;">Соотношение всех правильных и неправильных кликов за всё время.</p>
+      <div style="position:relative; width:200px; height:200px;">
+        <canvas id="chartAccuracy"></canvas>
+      </div>
+    </div>
+
+    <!-- Карточка 7: Среднее время ответа -->
+    <div class="card" style="padding:20px;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Среднее время ответа (сек) по темам</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px;">Сколько в среднем секунд ты тратишь на один вопрос в каждой теме.</p>
+      <div style="position:relative; width:100%; height:200px;">
+        <canvas id="chartSpeed"></canvas>
+      </div>
+    </div>
+
+    <!-- Карточка 8: Карта активности -->
+    <div id="heatmapCard" class="card" style="padding:20px; grid-column: 1 / -1;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Карта активности (последние 15 недель)</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px;">Визуализация того, как часто ты заходил. Чем темнее квадрат — тем больше времени провёл за учебой.</p>
+      <div id="heatmapContainer" style="display:flex; flex-direction:column; gap:4px; overflow-x:auto; padding-bottom:10px;"></div>
+    </div>
+
+    <!-- Карточка 9: Радар компетенций -->
+    <div class="card" style="padding:20px; grid-column: 1 / -1;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Радар компетенций (по темам)</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px;">Сбалансированность знаний. Идеальная фигура — ровный круг. Выпирающие углы — сильные темы, впадины — слабые.</p>
+      <div style="position:relative; width:100%; height:400px;">
+        <canvas id="chartRadar"></canvas>
+      </div>
+    </div>
+
+    <!-- Карточка 10: Структура базы -->
+    <div class="card" style="padding:20px; grid-column: 1 / -1;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Структура базы вопросов</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px;">Из чего состоит твой файл с вопросами (обычные, с картинками, с запретом перемешивания).</p>
+      <div style="position:relative; width:100%; height:150px; display:flex; justify-content:center;">
+        <canvas id="chartStructure"></canvas>
+      </div>
+    </div>
+	
+    <!-- Карточка 12: Распределение правильных ответов -->
+    <div class="card" style="padding:20px; grid-column: 1 / -1;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Где спрятан правильный ответ?</h3>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:20px; line-height: 1.4;">
+        Этот график показывает, на какой позиции чаще всего находится правильный ответ в зависимости от того, сколько вариантов было в вопросе.<br>
+        Если цвета распределены равномерно (примерно по 20–25%) — значит, составители тестов не оставляли правильный ответ в одном и том же месте. Если один из цветов сильно выделяется — вы можете случайно «подсмотреть» этот паттерн, и тест начнет приносить завышенные баллы.
+      </p>
+      <div style="position:relative; width:100%; height:250px;">
+        <canvas id="chartAnswerDist"></canvas>
+      </div>
+    </div>
+
+
+    <!-- Карточка 11: Кривая забывания -->
+    <div class="card" style="padding:20px; grid-column: 1 / -1;">
+      <h3 style="margin-top:0; margin-bottom:4px; color:var(--muted); font-size:14px; text-transform:uppercase;">Кривая забывания (давность ответа)</h3>
+      <p style="font-size:12px; color:var(--muted); margin-bottom:20px;">Зелёные столбцы — ты отвечал на эти вопросы недавно. Красные — пора бы повторить, чтобы знания не улетучились. Кликни на столбец для дополнительной информации</p>
+      <div style="position:relative; width:100%; height:250px;">
+        <canvas id="chartForgetting"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Шторка со списком вопросов для повторения -->
+<div id="reviewListOverlay" style="position:fixed; inset:0; z-index:2100; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; padding:20px;">
+  <div class="card" style="width:100%; max-width:800px; max-height:85vh; display:flex; flex-direction:column; background:var(--card);">
+    <div style="padding:16px 20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+      <h3 id="reviewListTitle" style="margin:0; font-size:18px;">Вопросы для повторения</h3>
+      <button class="ghost" onclick="document.getElementById('reviewListOverlay').style.display='none'">✕</button>
+    </div>
+    
+    <div id="reviewListContent" style="padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; flex: 1;">
+      <!-- Сюда будут вставляться вопросы -->
+    </div>
+    
+    <div style="padding:16px 20px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px;">
+      <button id="startReviewSetBtn" style="background:var(--accent); color:#fff; display:none;">▶ Пройти эти вопросы</button>
+      <button class="ghost" onclick="document.getElementById('reviewListOverlay').style.display='none'">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<div class="lightbox" id="lightbox" style="display: none;">
+  <div class="close-hint">Клик — закрыть · Esc — закрыть</div>
+  <img id="lightboxImg" alt="">
+</div>
+
+<div id="gamificationToasts" style="position:fixed; bottom:20px; left:50%; transform:translateX(-50%); z-index:3000; display:flex; flex-direction:column; gap:8px; pointer-events:none;"></div>
+
+
+<!-- Модальное окно достижений -->
+<div id="badgesModal" style="display:none; position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding:20px;">
+  <div class="card" style="width:100%; max-width:800px; max-height:85vh; display:flex; flex-direction:column;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; border-bottom:1px solid var(--border);">
+      <h2 style="margin:0; font-size:18px;">🏆 Достижения</h2>
+      <button id="closeBadgesBtn" class="modal-close-btn">✕</button>
+    </div>
+    <div id="badgesGrid" style="padding:20px; overflow-y:auto; display:grid; grid-template-columns:repeat(auto-fill, minmax(140px, 1fr)); gap:16px;">
+      <!-- Сюда будут вставлены карточки достижений -->
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛКА МОБИЛЬНОГО БИЛДА -->
+<div id="buildModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>📱 Сборка приложения</h2>
+      <button class="icon-btn-close" onclick="closeBuildModal()">✕</button>
+    </div>
+        <div class="modal-body" style="display:flex; flex-direction:column; gap:12px;">
+      
+      <!-- Сообщение о статусе окружения -->
+      <div id="buildEnvStatus" style="padding:12px; border-radius:8px; font-size:14px; text-align:center; display:none;"></div>
+
+      <p id="buildInstructions" style="margin:0; font-size:13px; color:var(--muted);">Выберите файлы, которые нужно включить в итоговый HTML-файл.</p>
+      
+      <!-- Контейнер для списка файлов (появится только если мы локально) -->
+      <div id="buildFileList" style="display:none; flex-direction:column; gap:8px; max-height: 40vh; overflow-y: auto; padding-right: 4px;">
+        <!-- Сюда JS сгенерирует список файлов -->
+      </div>
+
+      <button class="btn-primary" id="startBuildBtn" onclick="executeBuild()" style="margin-top:10px; padding:16px;">🚀 Собрать и скачать</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- МОДАЛКА ВЫБОРА ТЕМ -->
+<div id="startOptionsModal" class="modal-overlay">
+  <div class="modal-content full-screen" style="display: flex; flex-direction: column;">
+    
+    <!-- Шапка -->
+    <div class="start-options-header">
+      <div class="start-options-title">Что тестируем?</div>
+      <button class="icon-btn-close" onclick="closeStartOptionsModal()">✕</button>
+    </div>
+
+    <!-- Скроллируемая область (Пресеты + Темы) -->
+<div class="start-scroll-area">
+  <!-- Фиксированная панель с кнопками -->
+  <div id="startPresets" class="presets-chips">
+    <button class="preset-btn icon-only" data-preset="all" title="Выбрать все темы">
+      <span class="native-checkbox checked"></span>
+    </button>
+    <button class="preset-btn icon-only" data-preset="none" title="Снять все темы">
+      <span class="native-checkbox"></span>
+    </button>
+    <button class="preset-btn" data-preset="errors" id="presetErrorsBtn">Ошибки (<span id="presetErrorsCount">0</span>)</button>
+    <button class="preset-btn" data-preset="favorites" id="presetFavoritesBtn">Избранное (<span id="presetFavoritesCount">0</span>)</button>
+  </div>
+  
+  <!-- Скроллируемый список тем -->
+  <div id="startTopicsList" class="start-topics-list"></div>
+</div>
+
+    <!-- Футер с кнопками перемешивания и стартом -->
+    <div class="start-options-footer">
+      <div class="start-options-summary">
+        
+        <div class="shuffle-controls-row">
+          <button class="shuffle-toggle-btn" id="startShuffleQBtn" data-behavior="shuffleQ">🔀 Вопросы</button>
+          <button class="shuffle-toggle-btn" id="startShuffleABtn" data-behavior="shuffleA">🔀 Ответы</button>
+        </div>
+        
+        <div class="start-options-count" id="startOptionsCount">Выбрано: 0 тем (0 вопросов)</div>
+        
+        <!-- ВАЖНО: Атрибут onclick должен быть здесь -->
+        <button class="btn-primary" id="startOptionsGoBtn" onclick="startFromOptions()" disabled>▶ Начать тест</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="testModal" class="modal-overlay">
+  <div class="modal-content full-screen">
+    
+    <div id="mobileQuiz" class="quiz-scroll-area" style="padding-top: 0;"></div>
+  </div>
+</div>
+
+<!-- МОДАЛКА РАЗБОРА ОТВЕТОВ -->
+<div id="reviewModal" class="modal-overlay">
+  <div class="modal-content full-screen">
+    <div class="modal-header">
+      <h2>Разбор ответов</h2>
+      <button class="icon-btn-close" onclick="closeReviewModal()">✕</button>
+    </div>
+    <div class="modal-body" id="reviewBody" style="padding: 16px;">
+      <!-- Сюда будет рендериться разбор -->
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно ежедневных квестов -->
+<div id="questsModal" style="display:none; position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding:20px;">
+  <div class="card" style="width:100%; max-width:500px; max-height:85vh; display:flex; flex-direction:column;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; border-bottom:1px solid var(--border);">
+      <h2 style="margin:0; font-size:18px;">📋 Ежедневные квесты</h2>
+      <button class="modal-close-btn" onclick="document.getElementById('questsModal').style.display='none'">✕</button>
+    </div>
+    <div id="questsListContent" style="padding:20px; overflow-y:auto; display:flex; flex-direction:column; gap:12px;">
+      <!-- Сюда будут вставлены квесты -->
+    </div>
+  </div>
+</div>
+
+<!-- Оверлей карты прогресса -->
+<div id="mapOverlay" style="position:fixed; inset:0; z-index:2000; background:var(--bg); display:none; flex-direction:column;">
+  <div style="padding:16px 24px; background:var(--card); border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:10;">
+    <h2 style="margin:0; font-size:20px;">🗺️ Карта прогресса</h2>
+    <button class="modal-close-btn" onclick="document.getElementById('mapOverlay').style.display='none'">✕</button>
+  </div>
+  <div style="max-width:1000px; margin:0 auto; width:100%; padding:24px;">
+    <div id="mapGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:16px;"></div>
+  </div>
+</div>
+
+<!-- Модальное окно рекордов -->
+<div id="recordsModal" style="display:none; position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; padding:20px;">
+  <div class="card" style="width:100%; max-width:550px; max-height:85vh; display:flex; flex-direction:column;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:16px; border-bottom:1px solid var(--border);">
+      <h2 style="margin:0; font-size:18px;">🏅 Личные рекорды</h2>
+      <button id="closeRecordsBtn" class="modal-close-btn">✕</button>
+    </div>
+    <div style="padding:20px; overflow-y:auto;">
+      <div style="font-size:12px; color:var(--muted); margin-bottom:16px; padding:10px; background:var(--bg); border-radius:6px; line-height:1.4;">
+        <b>Как считаются очки?</b><br>
+        Очки за сессию = <code>Правильные ответы × (Всего вопросов / 10)</code>.<br>
+        Это значит, что сессия из 100 вопросов с 1 ошибкой (990 очков) ценится выше, чем идеальная сессия из 10 вопросов (100 очков).<br>
+        Для скорости: очки = <code>(Всего вопросов / Время в секундах) × 100</code>.
+      </div>
+      <div id="recordsList" style="display:flex; flex-direction:column; gap:12px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Модальное окно боя с боссом -->
+<div id="bossFightModal" style="display:none; position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; padding:20px;">
+  <div class="card" style="width:100%; max-width:450px; text-align:center; padding:30px;">
+    <div id="bossFightIcon" style="font-size:48px; margin-bottom:8px;">⚔️</div>
+    <h2 id="bossFightTitle" style="margin:0 0 4px; font-size:24px; font-weight:700; color:var(--text);">Босс дня</h2>
+    <p id="bossFightDesc" style="margin:0 0 24px; font-size:15px; color:var(--muted);">Имя босса</p>
+    
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button id="bossFightStart" style="background:var(--err); border-color:var(--err); font-size:16px; padding:10px 24px;">В бой!</button>
+      <button id="bossFightCancel" class="ghost" style="font-size:16px; padding:10px 24px;">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка результата боя с боссом -->
+<div id="bossResultModal" style="display:none; position:fixed; inset:0; z-index:4000; background:rgba(0,0,0,0.85); align-items:center; justify-content:center; padding:20px;">
+  <div class="card" style="width:100%; max-width:450px; text-align:center; padding:40px 30px;">
+    <div id="bossResultIcon" style="font-size:64px; margin-bottom:16px; filter:drop-shadow(0 0 20px rgba(255,215,0,0.5));">⚔️</div>
+    <h2 id="bossResultTitle" style="margin:0 0 8px; font-size:28px; font-weight:800;">Босс повержен!</h2>
+    <p id="bossResultDesc" style="color:var(--muted); font-size:15px; margin-bottom:24px;">Вы победили!</p>
+    <div id="bossResultXp" style="font-size:20px; font-weight:bold; color:var(--accent); margin-bottom:24px;">+100 XP</div>
+    
+    <button id="closeBossResultBtn" class="ghost" style="font-size:16px; padding:10px 30px; width:100%;">Продолжить</button>
+  </div>
+</div>
+<script src="boot.js"></script>
+</body>
+</html>
